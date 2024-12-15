@@ -680,7 +680,7 @@ class App:
             # Create a plot
             self.create_plot("A")
 
-            for i in range(self.row_countA + 1):
+            for i in range(self.matrixA.matrix.shape[0] + 1):
                 for j in range(self.col_countA):
                     # Result Labels for Matrix A
                     label = ctk.CTkLabel(result_matrix_frames[0],  # Frame for A
@@ -989,7 +989,7 @@ class App:
             # Create a plot
             self.create_plot("A")
 
-            for i in range(self.row_countB + 1):
+            for i in range(self.matrixB.matrix.shape[0] + 1):
                 for j in range(self.col_countB):
                     # Result Labels for Matrix A
                     label = ctk.CTkLabel(result_matrix_frames[0],  # Frame for A
