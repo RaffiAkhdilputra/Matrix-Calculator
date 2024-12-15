@@ -29,6 +29,7 @@ class Matrix:
     
     # Mengubah matriks menjadi data x dan y
     def _convertToXYData(self):
+
         self._xdata = []
         self._ydata = []
 
@@ -205,7 +206,7 @@ class Calculator(Matrix):
 
             # nilai x baru
             x = x_new.copy()
-            print(x," ",  _)
+            print(f"{x}, {_}")
 
         print("Metode Jacobi tidak konvergen setelah mencapai iterasi maksimum.")
         return x_new
@@ -234,5 +235,17 @@ class Calculator(Matrix):
 
         for k in range(1, n + 1):
             p = a[n - k] + (x - self._xdata[n - k])*p
+
+        # tambah element di matrix
+        if self.col > 1:
+            new_row = np.zeros(self.col)
+            new_row[0] = x  
+            new_row[1] = p  
+            
+            # Resize 
+            self.matrix = np.vstack((self.matrix, new_row))
+            self.row += 1  
+            self.result = self.matrix  
+        
 
         return p

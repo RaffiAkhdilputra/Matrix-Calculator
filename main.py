@@ -7,10 +7,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 class App:
 
     def __init__(self):
-
         self.root = tk.Tk()
         self.root.title("Matrix Calculator")
-        self.root.geometry("900x700")
+        self.root.geometry("850x700")
         self.root.resizable(width=False, height=True)
         self.row_countA = 3  
         self.col_countA = 3
@@ -442,14 +441,15 @@ class App:
                 print(f"lower:\n{lower} \n\nupper: \n{upper}")
             elif op == 'jac':
                 self.matrixA.result = self.matrixA.operasiIterasiJacobi(self.matrixC.matrix)
-                print( self.matrixA.result)
+                print(self.matrixA.result)
                 print(f"iterasi: {iter}")
                 self.spawn_result("A")
             elif op == 'np':
                 self.matrixA._convertToXYData()
                 self.matrixA.result = self.matrixA.operasiNewtonPolynomial(float(self.newtonPolinomialA_entry.get()))
-                print(self.matrixA.result)
-                self.spawn_result("A")
+
+                self.matrixA._convertToXYData()
+                self.spawn_result("A", op = 'np', xAxes = float(self.newtonPolinomialA_entry.get()))
 
         elif mat == 'B':
             if op == 'det':
@@ -486,7 +486,7 @@ class App:
                 print(self.matrixB.result)
                 self.spawn_result("B")
 
-    def spawn_result(self, mat, out = 1, L = None, U = None, op = None, variable = None):
+    def spawn_result(self, mat, out = 1, L = None, U = None, op = None, variable = None, xAxes = None):
 
         for widget in self.result_frame.winfo_children():
             widget.destroy()
@@ -556,6 +556,7 @@ class App:
                                         justify="center",
                                         anchor="center")
                     label_A.grid(row=i, column=j, padx=2, pady=2)
+    
         elif mat == 'A' and op == 'cr':
             # header
             result_header = ctk.CTkLabel(self.result_frame,
@@ -620,7 +621,7 @@ class App:
                                         justify="center",
                                         anchor="center")
                     label_C.grid(row=i, column=j, padx=2, pady=2)
-                    
+
         elif mat == 'A' and op == 'gj':
             # header
             result_header = ctk.CTkLabel(self.result_frame,
@@ -685,7 +686,52 @@ class App:
                                     anchor="center")
                 label_var.grid(row=i, column=j, padx=2, pady=2)
 
-            
+        elif mat == 'A' and op == 'np':
+            # header            
+            result_header = ctk.CTkLabel(self.result_frame,
+                                        text = "Result", 
+                                        width = 50,
+                                        font = ctk.CTkFont(family="Arial", size = 16, weight = "bold"),
+                                        text_color = "white",
+                                        justify = "left",
+                                        anchor = "w"
+                                        )
+            result_header.pack(side = "top", padx=5, pady=5)
+
+            # result frame
+            self.result_frame.pack(padx=5, pady=2, fill="both", expand=True)
+            result_matrix_frames = []
+
+            for i in range(out):
+                # Result Labels Frame
+                resultLabels_frame = ctk.CTkFrame(master=self.result_frame)
+                resultLabels_frame.pack(side = "left", padx=5, pady=5, fill="both", expand=True)
+                resultLabels_frame.columnconfigure(self.matrixA._getTuple('col'), weight=1, uniform="column")
+                resultLabels_frame.rowconfigure(self.matrixA._getTuple('row'), weight=1, uniform="column")
+                result_matrix_frames.append(resultLabels_frame)
+
+            resultMatrix_labels = []
+
+            graph_frame = ctk.CTkFrame(master=self.result_frame)
+            graph_frame.pack(side = "right", padx=5, pady=5, fill="both", expand=True)
+           
+            # Buat plot grafik
+            self.plot_frame = ctk.CTkFrame(graph_frame)
+            self.plot_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+            # Create a plot
+            self.create_plot("A")
+
+            for i in range(self.row_countA + 1):
+                for j in range(self.col_countA):
+                    # Result Labels for Matrix A
+                    label = ctk.CTkLabel(result_matrix_frames[0],  # Frame for A
+                                        text=f"{self.matrixA.matrix[i, j]:.2f}",
+                                        font=ctk.CTkFont(family="Arial", size=16, weight="bold"),
+                                        text_color="white",
+                                        justify="center",
+                                        anchor="center")
+                    label.grid(row=i, column=j, padx=2, pady=2)
 
         elif mat == 'A':
             # header
@@ -737,6 +783,42 @@ class App:
                         label.grid(row=i, column=j, padx=2, pady=2)
                         row_labels.append(label)
                     resultMatrix_labels.append(row_labels)
+
+    def create_plot(self, mat):
+        if mat == "A":
+            # Gambar canvas matplotliv
+            fig = Figure(figsize=(6, 4), dpi=100, facecolor='white', edgecolor='black')
+            ax = fig.add_subplot(111)
+            ax.plot(self.matrixA._xdata, self.matrixA._ydata, marker='o', linestyle='-', color='blue', label='Data Line')
+            ax.set_title("Data Plot")
+            ax.set_xlabel("X-axis")
+            ax.set_ylabel("Y-axis")
+            ax.legend()
+            ax.grid(True)
+
+            # Embed the Matplotlib figure into the customtkinter frame
+            canvas = FigureCanvasTkAgg(fig, master=self.plot_frame)
+            canvas_widget = canvas.get_tk_widget()
+            canvas_widget.pack(fill="both", expand=True)
+            canvas.draw()
+
+        if mat == "B":
+            # Gambar canvas matplotliv
+            fig = Figure(figsize=(6, 4), dpi=100, facecolor='white', edgecolor='black')
+            ax = fig.add_subplot(111)
+            ax.plot(self.matrixB._xdata, self.matrixB._ydata, marker='o', linestyle='-', color='blue', label='Data Line')
+            ax.set_title("Data Plot")
+            ax.set_xlabel("X-axis")
+            ax.set_ylabel("Y-axis")
+            ax.legend()
+            ax.grid(True)
+
+            # Embed the Matplotlib figure into the customtkinter frame
+            canvas = FigureCanvasTkAgg(fig, master=self.plot_frame)
+            canvas_widget = canvas.get_tk_widget()
+            canvas_widget.pack(fill="both", expand=True)
+            canvas.draw()
+
 
 if __name__ == "__main__":
     app = App()
