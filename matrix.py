@@ -180,7 +180,7 @@ class Calculator(Matrix):
 
         return lower, upper  # Mengembalikan matriks lower dan upper
 
-    def operasiIterasiJacobi(self, b: np.matrix, x0 = None, tol=1e-10, max_iter = 100) -> np.matrix:
+    def operasiIterasiJacobi(self, b: np.matrix, x0 = None, tol=1e-10, max_iter = 50) -> np.matrix:
         # x0=none Jika tidak diberikan (None), maka secara default akan diinisialisasi sebagai vektor nol sejumlah matriks A[0,0,0]
         if not self.isSquare():
             raise ValueError("Matriks harus persegi untuk metode Jacobi.")
