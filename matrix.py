@@ -71,11 +71,14 @@ class Calculator(Matrix):
                 result[i, j] = self.matrix[i, j] - m2.matrix[i, j]
         return np.matrix(result)
 
-    def operasiKali(self, m2) -> np.matrix:
-        result = np.zeros_like(self.matrix, dtype=float)
+    def operasiKali(self, m2) -> np.matrix:        
+        result = np.zeros((self.matrix.shape[0], m2.matrix.shape[1]), dtype=float)
+
         for i in range(self.matrix.shape[0]):
-            for j in range(self.matrix.shape[1]):
-                result[i, j] = self.matrix[i, j] * m2.matrix[i, j]
+            for j in range(m2.matrix.shape[1]):
+                for k in range(self.matrix.shape[1]):
+                    result[i, j] += self.matrix[i, k] * m2.matrix[k, j]
+
         return np.matrix(result)
 
     def operasiTranspose(self) -> np.matrix:
