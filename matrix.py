@@ -122,8 +122,10 @@ class Calculator(Matrix):
                 raise ValueError("Matriks singular, eliminasi tidak dapat dilanjutkan.")
             if max_row != k:
                 ab[[k, max_row]] = ab[[max_row, k]]
+
             # merubah baris supaya elemen diagonal nya jadi 1
             ab[k] /= ab[k, k]
+
             # Eliminasi elemen di atas dan di bawah elemen diagonal
             for i in range(n):
                 if i != k:
@@ -134,8 +136,18 @@ class Calculator(Matrix):
         a = ab[:, :-1]
         return x, a
 
-    def operasiCramer(self) -> np.matrix:
-        pass
+    def operasiCramer(self, matrix) -> np.matrix:
+        det_A = self.operasiDeterminan()
+        n = self.matrix.shape[0]
+        x = np.zeros((n, 1))
+        for i in range(n):
+            A_copy = self.matrix.copy()
+            A_copy[:, i] = matrix[
+                :, 0
+            ]  ## Ganti kolom ke-i di A_copy dengan matriks hasil (matrix)
+            det_Ai = np.linalg.det(A_copy)
+            x[i, 0] = det_Ai / det_A
+        return np.matrix(x)
 
     def operasiLuDecomposition(self) -> np.matrix:
         n = self.row
@@ -167,10 +179,34 @@ class Calculator(Matrix):
 
         return lower, upper  # Mengembalikan matriks lower dan upper
 
-    def operasiIterasiGaussSeidell(self) -> np.matrix:
-        pass
+    def gauss_seidel(self, b: np.matrix, x0=None, tol=1e-10, max_iter=100) -> np.matrix:
 
-    def operasiIterasiJacobi( self, b: np.matrix, x0 = None, tol = 1*10**(-5), max_iter = 100) -> np.matrix:
+        n = self.row
+        if x0 is None:
+            x0 = np.zeros(n)
+
+        x = x0.copy()
+        converged = False
+
+        for iteration in range(1, max_iter + 1):
+            x_old = x.copy()
+
+            for i in range(n):
+                # Compute the sum of A[i, j] * x[j] for all j != i
+                sum1 = np.dot(self.matrix[i, :i], x[:i])
+                sum2 = np.dot(self.matrix[i, i+1:], x_old[i+1:])
+
+                # Update x[i]
+                x[i] = (b[i] - sum1 - sum2) / self.matrix[i, i]
+
+            # cek konvergensi
+            if np.linalg.norm(x - x_old, ord=np.inf) < tol:
+                converged = True
+                break
+
+        return x, iteration, converged
+
+    def operasiIterasiJacobi(self, b: np.matrix, x0 = None, tol=1e-10, max_iter = 100) -> np.matrix:
         # x0=none Jika tidak diberikan (None), maka secara default akan diinisialisasi sebagai vektor nol sejumlah matriks A[0,0,0]
         if not self.isSquare():
             raise ValueError("Matriks harus persegi untuk metode Jacobi.")
@@ -227,138 +263,3 @@ class Calculator(Matrix):
             p = a[n - k] + (x - self._xdata[n - k])*p
 
         return p
-
-    # OPERASI NON-LINEAR
-    def operasiNewtonRaphson(self, f, f_aksen, x0: float, tol: float = 1e-7, max_iter: int = 100) -> float:
-        """
-        Newton-Raphson method for finding roots of a function.
-
-        Parameters:
-        - f: Function for which the root is to be found.
-        - f_aksen: Derivative of the function f.
-        - x0: Initial guess for the root.
-        - tol: Tolerance for the solution.
-        - max_iter: Maximum number of iterations.
-
-        Returns:
-        - The root of the function f.
-        """
-        x = x0
-        for iteration in range(max_iter):
-            fx = f(x)
-            dfx = f_aksen(x)
-
-            print(f"Iteration {iteration}: x = {x}, f(x) = {fx}, f'(x) = {dfx}")  # Debugging line
-
-            if abs(dfx) < 1e-12:
-                raise ValueError("Derivative near zero. Newton-Raphson method fails.")
-
-            # Update step
-            x_new = x - fx / dfx
-
-            # Check for convergence
-            if abs(x_new - x) < tol:
-                print(f"Converged to root: {x_new} after {iteration + 1} iterations")  # Debugging line
-                return x_new
-
-            x = x_new
-
-        raise ValueError("Maximum iterations reached. Newton-Raphson method did not converge.")
-
-    def operasiFixedPoint(self) -> np.matrix:
-        pass
-
-    def operasiBisection(self) -> np.matrix:
-        pass
-
-
-# UNTUK DEBUGING
-# matriks1 = Calculator(3, 2)
-# matriks2 = Calculator(2, 2)
-matriks3 = Calculator(3, 3)
-# matriks4 = Calculator(4, 2)
-
-matriksY = Calculator(3, 1)
-# x0_ = Calculator(3, 1)
-
-
-# matriks1.matrix = np.matrix([[1, 2], [3, 4], [5, 6]])
-# matriks2.matrix = np.matrix([[5, 6], [7, 8]])
-matriks3.matrix = np.matrix([[9, 3, 3], [1, 12, 9], [4, 6, 14]])
-# matriks4.matrix = np.matrix([[1, 5], [2, 4], [3, 3], [4, 2]])
-
-matriksY.matrix = np.matrix([[7], [2], [1]])
-# x0 = np.matrix([[0], [0], [0]])
-
-# print('Matriks 1:')
-# print(matriks1.matrix)
-
-# print('Matriks 2:')
-# print(matriks2.matrix)
-
-# === TEST TAMBAH ===
-# matriks1.showMatrix()
-# print(matriks1.operasiTambah(matriks2))
-# matriks1.showMatrix()
-
-# === TEST KURANG ===
-# matriks1.showMatrix()
-# print(matriks1.operasiKurang(matriks2))
-# matriks1.showMatrix()
-
-# === TEST KALI ===
-# matriks1.showMatrix()
-# print(matriks1.operasiKali(matriks2))
-# matriks1.showMatrix()
-
-# === TEST BAGI ===
-# matriks1.showMatrix()
-# print(matriks1.operasiBagi(matriks2))
-# matriks1.showMatrix()
-
-# === TEST TRANSPOSE ===
-# matriks1.showMatrix()
-# print(matriks1.operasiTranspose())
-# matriks1.showMatrix()
-
-# === TEST INVERSE ===
-# matriks1.showMatrix()
-# print(matriks1.operasiInverse())
-# matriks1.showMatrix()
-
-# === TEST DETERMINAN ===
-# matriks1.showMatrix()
-# print(matriks1.operasiDeterminan())
-# matriks1.showMatrix()
-
-# === TEST GAUS ===
-# print("Matriks Awal:")
-# solution, tranformed_a = matriks3.operasiGaussJordan(matriksY.matrix)
-# print("Solusi x:\n", solution)
-# print("Matriks 3 setelah eliminasi Gauss-Jordan:\n", tranformed_a)
-
-# === TEST LU DECOMPOSITION ===
-# print("Matriks Awal:")
-# matriks3.showMatrix()
-# lower, upper = matriks3.operasiLuDecomposition()
-
-# print("Lower Matrix:")
-# print(lower)
-
-# print("Upper Matrix:")
-# print(upper)
-
-# === TEST INTERPOLASI NEWTON ===
-# matriks4._convertToXYData()
-# print(matriks4.operasiNewtonPolynomial(8))
-
-# print(matriks4.operasiNewtonPolynomial(2.5))
-
-# === Iterasi Jacobi ===
-# print("matriks 3:")
-# matriks3.showMatrix()
-# print("matriks b:")
-# matriksY.showMatrix()
-# solusi_jacobi = matriks3.operasiIterasiJacobi(matriksY.matrix)
-# print("Solusi dengan metode Jacobi:")
-# print(solusi_jacobi)

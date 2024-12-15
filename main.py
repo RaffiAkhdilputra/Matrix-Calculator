@@ -429,16 +429,19 @@ class App:
                 var , self.matrixA.result = self.matrixA.operasiGaussJordan(self.matrixC.matrix)
                 print(f"variabel [x, y, z]:\n{var} \n\nresult: \n{self.matrixA.result}")
             elif op == 'cr':
-                self.matrixA.result = self.matrixA.operasiCramer()
+                self.matrixA.result = self.matrixA.operasiCramer(self.matrixC.matrix)
                 print(self.matrixA.result)
                 self.spawn_result("A")
             elif op == 'lu':
                 _output = 2
                 lower , upper = (self.matrixA.operasiLuDecomposition())
+                self.spawn_result("A", _output, L=lower, U=upper)
                 print(f"lower:\n{lower} \n\nupper: \n{upper}")
             elif op == 'jac':
-                self.matrixA.result = self.matrixA.operasiIterasiJacobi(self.matrixC.matrix)
-                print(self.matrixA.result)
+                self.matrixA.result, iter, konvergensi = self.matrixA.operasiIterasiJacobi(self.matrixC.matrix)
+                print( self.matrixA.result)
+                print(f"iterasi: {iter}")
+                print(f"konvergensi: {konvergensi}")
                 self.spawn_result("A")
             elif op == 'np':
                 self.matrixA._convertToXYData()
@@ -464,7 +467,7 @@ class App:
                 # self.spawn_result("B", _output)
                 print(f"variabel [x, y, z]:\n{var} \n\nresult: \n{self.matrixB.result}")
             elif op == 'cr':
-                self.matrixB.result = self.matrixB.operasiCramer()
+                self.matrixB.result = self.matrixB.operasiCramer(self.matrixD.matrix)
                 print(self.matrixB.result)
                 self.spawn_result("B")
             elif op == 'lu':
@@ -523,15 +526,16 @@ class App:
                 print(result_matrix_frames[n])
                 for i in range(self.row_countA):
                     row_labels = []
-                    for j in range(self.col_countA):
-                        label = ctk.CTkLabel(result_matrix_frames[n],
-                                            text = f"{self.matrixA.result[i, j]}", 
-                                            width = 50,
-                                            font = ctk.CTkFont(family="Arial", size = 16, weight = "bold"),
-                                            text_color = "white",
-                                            justify = "center",
-                                            anchor = "center"
-                                            )
+                    for j in range(self.matrixA.result.shape[1] if len(self.matrixA.result.shape) > 1 else 1):
+                        label = ctk.CTkLabel(
+                            result_matrix_frames[n],
+                            text=f"{self.matrixA.result[i, j] if len(self.matrixA.result.shape) > 1 else self.matrixA.result[i]}",
+                            width=50,
+                            font=ctk.CTkFont(family="Arial", size=16, weight="bold"),
+                            text_color="white",
+                            justify="center",
+                            anchor="center"
+                        )
                         label.grid(row=i, column=j, padx=2, pady=2)
                         row_labels.append(label)
                     resultMatrix_labels.append(row_labels)
