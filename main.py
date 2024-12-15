@@ -400,7 +400,7 @@ class App:
         except:
             Exception('Error')
 
-        print("Hasil:")
+        # print("Hasil:")
         if op == '+':
             self.matrixA.result = self.matrixA.operasiTambah(self.matrixB)
             self.spawn_result("A")
@@ -415,35 +415,35 @@ class App:
             if op == 'det':
                 self.matrixA.result = self.matrixA.operasiDeterminan()
                 self.spawn_result("A", op = 'det')
-                print(self.matrixA.result)
+                # print(self.matrixA.result)
             elif op == 't':
                 self.matrixA.result = self.matrixA.operasiTranspose()
                 self.spawn_result("A")
-                print(self.matrixA.result)
+                # print(self.matrixA.result)
             elif op == 'inv':
                 self.matrixA.result = self.matrixA.operasiInverse()
-                print(self.matrixA.result)
+                # print(self.matrixA.result)
                 self.spawn_result("A")
             elif op == 'gj':
                 _output = 3
                 var, self.matrixA.result = self.matrixA.operasiGaussJordan(self.matrixC.matrix)
                 self.spawn_result("A", _output, variable = var, op = 'gj')
-                print(self.matrixA.matrix)
-                print(f"variabel [x, y, z]:\n{type(var)} \n\nresult: \n{self.matrixA.result}")
+                # print(self.matrixA.matrix)
+                # print(f"variabel [x, y, z]:\n{type(var)} \n\nresult: \n{self.matrixA.result}")
             elif op == 'cr':
                 _output = 3
                 self.matrixA.result = self.matrixA.operasiCramer(self.matrixC.matrix)
-                print(self.matrixA.result)
+                # print(self.matrixA.result)
                 self.spawn_result("A", _output, op = 'cr')
             elif op == 'lu':
                 _output = 3
                 lower , upper = (self.matrixA.operasiLuDecomposition())
                 self.spawn_result("A", _output, L=lower, U=upper)
-                print(f"lower:\n{lower} \n\nupper: \n{upper}")
+                # print(f"lower:\n{lower} \n\nupper: \n{upper}")
             elif op == 'jac':
                 self.matrixA.result = self.matrixA.operasiIterasiJacobi(self.matrixC.matrix)
-                self.spawn_result("A", op = 'jac')
                 print(self.matrixA.result)
+                self.spawn_result("A", op = 'jac')
             elif op == 'np':
                 self.matrixA._convertToXYData()
                 self.matrixA.result = self.matrixA.operasiNewtonPolynomial(float(self.newtonPolinomialA_entry.get()))
@@ -455,35 +455,35 @@ class App:
             if op == 'det':
                 self.matrixB.result = self.matrixB.operasiDeterminan()
                 self.spawn_result("B", op = 'det')
-                print(self.matrixB.result)
+                # print(self.matrixB.result)
             elif op == 't':
                 self.matrixB.result = self.matrixB.operasiTranspose()
                 self.spawn_result("B")
-                print(self.matrixB.result)
+                # print(self.matrixB.result)
             elif op == 'inv':
                 self.matrixB.result = self.matrixB.operasiInverse()
-                print(self.matrixB.result)
+                # print(self.matrixB.result)
                 self.spawn_result("B")
             elif op == 'gj':
                 _output = 3
                 var, self.matrixB.result = self.matrixB.operasiGaussJordan(self.matrixD.matrix)
                 self.spawn_result("B", _output, variable = var, op = 'gj')
-                print(self.matrixB.matrix)
-                print(f"variabel [x, y, z]:\n{type(var)} \n\nresult: \n{self.matrixB.result}")
+                # print(self.matrixB.matrix)
+                # print(f"variabel [x, y, z]:\n{type(var)} \n\nresult: \n{self.matrixB.result}")
             elif op == 'cr':
                 _output = 3
                 self.matrixB.result = self.matrixB.operasiCramer(self.matrixD.matrix)
-                print(self.matrixB.result)
+                # print(self.matrixB.result)
                 self.spawn_result("B", _output, op = 'cr')
             elif op == 'lu':
                 _output = 3
                 lower , upper = (self.matrixB.operasiLuDecomposition())
                 self.spawn_result("B", _output, L=lower, U=upper)
-                print(f"lower:\n{lower} \n\nupper: \n{upper}")
+                # print(f"lower:\n{lower} \n\nupper: \n{upper}")
             elif op == 'jac':
                 self.matrixB.result = self.matrixB.operasiIterasiJacobi(self.matrixD.matrix)
-                self.spawn_result("B", op = 'jac')
                 print(self.matrixB.result)
+                self.spawn_result("B", op = 'jac')
             elif op == 'np':
                 self.matrixB._convertToXYData()
                 self.matrixB.result = self.matrixB.operasiNewtonPolynomial(float(self.newtonPolinomialB_entry.get()))
@@ -775,7 +775,6 @@ class App:
 
             # Buat entri baru sesuai row_count dan col_count matrix A
             for n in range(out):
-                print(result_matrix_frames[n])
                 for i in range(self.row_countA):
                     row_labels = []
                     for j in range(self.matrixA.result.shape[1] if len(self.matrixA.result.shape) > 1 else 1):
@@ -1084,7 +1083,6 @@ class App:
 
             # Buat entri baru sesuai row_countB dan col_count matrix A
             for n in range(out):
-                print(result_matrix_frames[n])
                 for i in range(self.row_countB):
                     row_labels = []
                     for j in range(self.matrixB.result.shape[1] if len(self.matrixB.result.shape) > 1 else 1):
