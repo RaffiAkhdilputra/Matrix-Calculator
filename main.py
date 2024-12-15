@@ -617,6 +617,19 @@ class App:
 
         elif mat == 'A' and op == 'gj':
             # result frame
+            self.result_frame.pack(padx=5, pady=2, fill="both", expand=True)
+            result_matrix_frames = []
+
+            for i in range(out):
+                # Result Labels Frame
+                resultLabels_frame = ctk.CTkFrame(master=self.result_frame)
+                resultLabels_frame.pack(side = "left", padx=5, pady=5, fill="both", expand=True)
+                resultLabels_frame.columnconfigure(self.matrixA._getTuple('col'), weight=1, uniform="column")
+                resultLabels_frame.rowconfigure(self.matrixA._getTuple('row'), weight=1, uniform="column")
+                result_matrix_frames.append(resultLabels_frame)
+
+            resultMatrix_labels = []
+
             graph_frame = ctk.CTkFrame(master=self.result_frame)
             graph_frame.pack(side = "right", padx=5, pady=5, fill="both", expand=True)
             
