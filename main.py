@@ -999,7 +999,7 @@ class App:
             self.plot_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
             # Create a plot
-            self.create_plot("A")
+            self.create_plot("B")
 
             for i in range(self.matrixB.matrix.shape[0] + 1):
                 for j in range(self.col_countB):
