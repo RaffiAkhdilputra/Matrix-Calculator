@@ -179,33 +179,6 @@ class Calculator(Matrix):
 
         return lower, upper  # Mengembalikan matriks lower dan upper
 
-    def gauss_seidel(self, b: np.matrix, x0=None, tol=1e-10, max_iter=100) -> np.matrix:
-
-        n = self.row
-        if x0 is None:
-            x0 = np.zeros(n)
-
-        x = x0.copy()
-        converged = False
-
-        for iteration in range(1, max_iter + 1):
-            x_old = x.copy()
-
-            for i in range(n):
-                # Compute the sum of A[i, j] * x[j] for all j != i
-                sum1 = np.dot(self.matrix[i, :i], x[:i])
-                sum2 = np.dot(self.matrix[i, i+1:], x_old[i+1:])
-
-                # Update x[i]
-                x[i] = (b[i] - sum1 - sum2) / self.matrix[i, i]
-
-            # cek konvergensi
-            if np.linalg.norm(x - x_old, ord=np.inf) < tol:
-                converged = True
-                break
-
-        return x, iteration, converged
-
     def operasiIterasiJacobi(self, b: np.matrix, x0 = None, tol=1e-10, max_iter = 100) -> np.matrix:
         # x0=none Jika tidak diberikan (None), maka secara default akan diinisialisasi sebagai vektor nol sejumlah matriks A[0,0,0]
         if not self.isSquare():

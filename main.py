@@ -10,7 +10,7 @@ class App:
 
         self.root = tk.Tk()
         self.root.title("Matrix Calculator")
-        self.root.geometry("860x650")
+        self.root.geometry("900x700")
         self.root.resizable(width=False, height=True)
         self.row_countA = 3  
         self.col_countA = 3
@@ -425,23 +425,25 @@ class App:
                 print(self.matrixA.result)
                 self.spawn_result("A")
             elif op == 'gj':
-                _output = 2
-                var , self.matrixA.result = self.matrixA.operasiGaussJordan(self.matrixC.matrix)
-                print(f"variabel [x, y, z]:\n{var} \n\nresult: \n{self.matrixA.result}")
+                _output = 3
+                var, self.matrixA.result = self.matrixA.operasiGaussJordan(self.matrixC.matrix)
+                self.spawn_result("A", _output, variable = var, op = 'gj')
+                print(self.matrixA.matrix)
+                print(f"variabel [x, y, z]:\n{type(var)} \n\nresult: \n{self.matrixA.result}")
             elif op == 'cr':
+                _output = 3
                 self.matrixA.result = self.matrixA.operasiCramer(self.matrixC.matrix)
                 print(self.matrixA.result)
-                self.spawn_result("A")
+                self.spawn_result("A", _output, op = 'cr')
             elif op == 'lu':
-                _output = 2
+                _output = 3
                 lower , upper = (self.matrixA.operasiLuDecomposition())
                 self.spawn_result("A", _output, L=lower, U=upper)
                 print(f"lower:\n{lower} \n\nupper: \n{upper}")
             elif op == 'jac':
-                self.matrixA.result, iter, konvergensi = self.matrixA.operasiIterasiJacobi(self.matrixC.matrix)
+                self.matrixA.result = self.matrixA.operasiIterasiJacobi(self.matrixC.matrix)
                 print( self.matrixA.result)
                 print(f"iterasi: {iter}")
-                print(f"konvergensi: {konvergensi}")
                 self.spawn_result("A")
             elif op == 'np':
                 self.matrixA._convertToXYData()
@@ -484,12 +486,208 @@ class App:
                 print(self.matrixB.result)
                 self.spawn_result("B")
 
-    def spawn_result(self, mat, out = 1, L = None, U = None):
+    def spawn_result(self, mat, out = 1, L = None, U = None, op = None, variable = None):
 
         for widget in self.result_frame.winfo_children():
             widget.destroy()
 
-        if mat == 'A':
+        # matrix A KHUSUS LU DECOMPOSITION
+        if mat == 'A' and L is not None and U is not None:
+            # header
+            result_header = ctk.CTkLabel(self.result_frame,
+                                        text = "Result", 
+                                        width = 50,
+                                        font = ctk.CTkFont(family="Arial", size = 16, weight = "bold"),
+                                        text_color = "white",
+                                        justify = "left",
+                                        anchor = "w"
+                                        )
+            result_header.pack(side = "top", padx=5, pady=5)
+
+            # result frame
+            self.result_frame.pack(padx=5, pady=2, fill="both", expand=True)
+            result_matrix_frames = []
+
+            for i in range(out):
+                # Result Labels Frame
+                resultLabels_frame = ctk.CTkFrame(master=self.result_frame)
+                resultLabels_frame.pack(side = "left", padx=5, pady=5, fill="both", expand=True)
+                resultLabels_frame.columnconfigure(self.matrixA._getTuple('col'), weight=1, uniform="column")
+                resultLabels_frame.rowconfigure(self.matrixA._getTuple('row'), weight=1, uniform="column")
+                result_matrix_frames.append(resultLabels_frame)
+
+            resultMatrix_labels = []
+
+            graph_frame = ctk.CTkFrame(master=self.result_frame)
+            graph_frame.pack(side = "right", padx=5, pady=5, fill="both", expand=True)
+            
+            _empty = ctk.CTkLabel(graph_frame, text="No Graph", font = ctk.CTkFont(family="Arial", size = 16, weight = "bold"), text_color = "white")
+            _empty.pack(padx = 5, pady = 5, fill = "both", expand = True)
+
+            for i in range(self.row_countA):
+                for j in range(self.col_countA):
+                    # Result Labels for Matrix L
+                    label = ctk.CTkLabel(result_matrix_frames[0],  # Frame for L
+                                        text=f"{L[i, j]:.2f}",
+                                        font=ctk.CTkFont(family="Arial", size=16, weight="bold"),
+                                        text_color="white",
+                                        justify="center",
+                                        anchor="center")
+                    label.grid(row=i, column=j, padx=2, pady=2)
+
+            for i in range(self.row_countA):
+                for j in range(self.col_countA):
+                    # Result Labels for Matrix U
+                    label_U = ctk.CTkLabel(result_matrix_frames[1],  # Frame for U
+                                        text=f"{U[i, j]:.2f}",
+                                        font=ctk.CTkFont(family="Arial", size=16, weight="bold"),
+                                        text_color="white",
+                                        justify="center",
+                                        anchor="center")
+                    label_U.grid(row=i, column=j, padx=2, pady=2)
+
+            for i in range(self.row_countA):
+                for j in range(self.col_countA):
+                    # Result Labels untuk Matrix A
+                    label_A = ctk.CTkLabel(result_matrix_frames[2],  # Frame for A
+                                        text=f"{self.matrixA.matrix[i, j]:.2f}",
+                                        font=ctk.CTkFont(family="Arial", size=16, weight="bold"),
+                                        text_color="white",
+                                        justify="center",
+                                        anchor="center")
+                    label_A.grid(row=i, column=j, padx=2, pady=2)
+        elif mat == 'A' and op == 'cr':
+            # header
+            result_header = ctk.CTkLabel(self.result_frame,
+                                        text = "Result", 
+                                        width = 50,
+                                        font = ctk.CTkFont(family="Arial", size = 16, weight = "bold"),
+                                        text_color = "white",
+                                        justify = "left",
+                                        anchor = "w"
+                                        )
+            result_header.pack(side = "top", padx=5, pady=5)
+
+            # result frame
+            self.result_frame.pack(padx=5, pady=2, fill="both", expand=True)
+            result_matrix_frames = []
+
+            for i in range(out):
+                # Result Labels Frame
+                resultLabels_frame = ctk.CTkFrame(master=self.result_frame)
+                resultLabels_frame.pack(side = "left", padx=5, pady=5, fill="both", expand=True)
+                resultLabels_frame.columnconfigure(self.matrixA._getTuple('col'), weight=1, uniform="column")
+                resultLabels_frame.rowconfigure(self.matrixA._getTuple('row'), weight=1, uniform="column")
+                result_matrix_frames.append(resultLabels_frame)
+
+            resultMatrix_labels = []
+
+            graph_frame = ctk.CTkFrame(master=self.result_frame)
+            graph_frame.pack(side = "right", padx=5, pady=5, fill="both", expand=True)
+            
+            _empty = ctk.CTkLabel(graph_frame, text="No Graph", font = ctk.CTkFont(family="Arial", size = 16, weight = "bold"), text_color = "white")
+            _empty.pack(padx = 5, pady = 5, fill = "both", expand = True)
+
+            for i in range(self.row_countA):
+                for j in range(self.col_countA):
+                    # Result Labels for Matrix A
+                    label = ctk.CTkLabel(result_matrix_frames[0],  # Frame for A
+                                        text=f"{self.matrixA.matrix[i, j]:.2f}",
+                                        font=ctk.CTkFont(family="Arial", size=16, weight="bold"),
+                                        text_color="white",
+                                        justify="center",
+                                        anchor="center")
+                    label.grid(row=i, column=j, padx=2, pady=2)
+
+            for i in range(self.row_countA):
+                for j in range(0, 1):
+                    # Result Labels for Matrix Variable
+                    label_var = ctk.CTkLabel(result_matrix_frames[1],  # Frame for Variable
+                                        text=f"{self.matrixA.result[i, j]:.2f}",
+                                        font=ctk.CTkFont(family="Arial", size=16, weight="bold"),
+                                        text_color="white",
+                                        justify="center",
+                                        anchor="center")
+                    label_var.grid(row=i, column=j, padx=2, pady=2)
+
+            for i in range(self.row_countA):
+                for j in range(0, 1):
+                    # Result Labels untuk Matrix C
+                    label_C = ctk.CTkLabel(result_matrix_frames[2],  # Frame for C
+                                        text=f"{self.matrixC.matrix[i, j]:.2f}",
+                                        font=ctk.CTkFont(family="Arial", size=16, weight="bold"),
+                                        text_color="white",
+                                        justify="center",
+                                        anchor="center")
+                    label_C.grid(row=i, column=j, padx=2, pady=2)
+                    
+        elif mat == 'A' and op == 'gj':
+            # header
+            result_header = ctk.CTkLabel(self.result_frame,
+                                        text = "Result", 
+                                        width = 50,
+                                        font = ctk.CTkFont(family="Arial", size = 16, weight = "bold"),
+                                        text_color = "white",
+                                        justify = "left",
+                                        anchor = "w"
+                                        )
+            result_header.pack(side = "top", padx=5, pady=5)
+
+            # result frame
+            self.result_frame.pack(padx=5, pady=2, fill="both", expand=True)
+            result_matrix_frames = []
+
+            for i in range(out):
+                # Result Labels Frame
+                resultLabels_frame = ctk.CTkFrame(master=self.result_frame)
+                resultLabels_frame.pack(side = "left", padx=5, pady=5, fill="both", expand=True)
+                resultLabels_frame.columnconfigure(self.matrixA._getTuple('col'), weight=1, uniform="column")
+                resultLabels_frame.rowconfigure(self.matrixA._getTuple('row'), weight=1, uniform="column")
+                result_matrix_frames.append(resultLabels_frame)
+
+            resultMatrix_labels = []
+
+            graph_frame = ctk.CTkFrame(master=self.result_frame)
+            graph_frame.pack(side = "right", padx=5, pady=5, fill="both", expand=True)
+            
+            _empty = ctk.CTkLabel(graph_frame, text="No Graph", font = ctk.CTkFont(family="Arial", size = 16, weight = "bold"), text_color = "white")
+            _empty.pack(padx = 5, pady = 5, fill = "both", expand = True)
+
+            for i in range(self.row_countA):
+                for j in range(self.col_countA):
+                    # Result Labels for Matrix A
+                    label = ctk.CTkLabel(result_matrix_frames[0],  # Frame for A
+                                        text=f"{self.matrixA.matrix[i, j]:.2f}",
+                                        font=ctk.CTkFont(family="Arial", size=16, weight="bold"),
+                                        text_color="white",
+                                        justify="center",
+                                        anchor="center")
+                    label.grid(row=i, column=j, padx=2, pady=2)
+
+            for i in range(self.row_countA):
+                for j in range(0, 1):
+                    # Result Labels untuk Matrix Hasil
+                    label_result = ctk.CTkLabel(result_matrix_frames[2],  # Frame for Hasil
+                                        text=f"{self.matrixA.result[i, j]:.2f}",
+                                        font=ctk.CTkFont(family="Arial", size=16, weight="bold"),
+                                        text_color="white",
+                                        justify="center",
+                                        anchor="center")
+                    label_result.grid(row=i, column=j, padx=2, pady=2)
+
+            for i in range(self.row_countA):
+                # Result Labels for Matrix Variable
+                label_var = ctk.CTkLabel(result_matrix_frames[1],  # Frame for Variable
+                                    text=f"{variable[i]:.2f}",
+                                    font=ctk.CTkFont(family="Arial", size=16, weight="bold"),
+                                    text_color="white",
+                                    justify="center",
+                                    anchor="center")
+                label_var.grid(row=i, column=j, padx=2, pady=2)
+
+            
+
+        elif mat == 'A':
             # header
             result_header = ctk.CTkLabel(self.result_frame,
                                         text = "Result", 
@@ -529,7 +727,7 @@ class App:
                     for j in range(self.matrixA.result.shape[1] if len(self.matrixA.result.shape) > 1 else 1):
                         label = ctk.CTkLabel(
                             result_matrix_frames[n],
-                            text=f"{self.matrixA.result[i, j] if len(self.matrixA.result.shape) > 1 else self.matrixA.result[i]}",
+                            text=f"{self.matrixA.result[i, j] if len(self.matrixA.result.shape) > 1 else self.matrixA.result[i]:.2f}",
                             width=50,
                             font=ctk.CTkFont(family="Arial", size=16, weight="bold"),
                             text_color="white",
