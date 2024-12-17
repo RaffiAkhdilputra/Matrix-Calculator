@@ -142,8 +142,10 @@ class Calculator(Matrix):
 
     def operasiCramer(self, matrix) -> np.matrix:
         det_A = self.operasiDeterminan()
+
         n = self.matrix.shape[0]
         x = np.zeros((n, 1))
+
         for i in range(n):
             A_copy = self.matrix.copy()
             A_copy[:, i] = matrix[
@@ -162,28 +164,27 @@ class Calculator(Matrix):
         for i in range(n):
             # Matriks Upper
             for T in range(i, n):
-                # Penjumlahan elemen-elemen lower dan upper
-                sum = 0
+                sum_upper = 0
                 for j in range(i):
-                    sum += lower[i][j] * upper[j][T]
-                upper[i][T] = float(self.matrix[i, T].item() - sum)
+                    sum_upper += lower[i][j] * upper[j][T]
+                upper[i][T] = self.matrix[i, T] - sum_upper
 
             # Matriks Lower
             for T in range(i, n):
                 if i == T:
-                    lower[i][i] = 1
+                    lower[i][i] = 1  # Diagonal elemen lower selalu 1
                 else:
-                    sum = 0
+                    sum_lower = 0
                     for j in range(i):
-                        sum += lower[T][j] * upper[j][i]
-                lower[T][i] = (float(self.matrix[T, i].item()) - sum) / upper[i][i]
+                        sum_lower += lower[T][j] * upper[j][i]
+                    lower[T][i] = (self.matrix[T, i] - sum_lower) / upper[i][i]
 
         lower = np.matrix(lower)
         upper = np.matrix(upper)
 
         return lower, upper  # Mengembalikan matriks lower dan upper
 
-    def operasiIterasiJacobi(self, b: np.matrix, x0 = None, tol=1e-10, max_iter = 50) -> np.matrix:
+    def operasiIterasiJacobi(self, b: np.matrix, x0 = None, tol= 1e-5, max_iter = 1000) -> np.matrix:
         # x0=none Jika tidak diberikan (None), maka secara default akan diinisialisasi sebagai vektor nol sejumlah matriks A[0,0,0]
         if not self.isSquare():
             raise ValueError("Matriks harus persegi untuk metode Jacobi.")
@@ -203,6 +204,8 @@ class Calculator(Matrix):
                 sum_j = sum(self.matrix[i, j] * x[j] for j in range(n) if j != i)
                 x_new[i] = (b[i] - sum_j) / self.matrix[i, i]
 
+            # presentase_x = 
+
             # cek konvergensi
             if np.linalg.norm(x_new - x, ord = np.inf) < tol:
                 return np.matrix(x_new)
@@ -212,7 +215,7 @@ class Calculator(Matrix):
             print(f"{x}, {_}")
 
         print("Metode Jacobi tidak konvergen setelah mencapai iterasi maksimum.")
-        return x_new
+        return float(x_new)
 
     
     def _poly_newton_coefficient(self):
@@ -252,3 +255,30 @@ class Calculator(Matrix):
         
 
         return p
+
+
+# matrixA = Calculator(3, 3)
+# matrixY = Calculator(3, 1)
+
+# matrixA.matrix = np.matrix([[9, 2, 3], 
+#                            [1, 12, 9], 
+#                            [4, 5, 14]])
+
+# matrixY.matrix = np.matrix([[7], 
+#                            [2], 
+#                            [1]])
+
+# matrixA.showMatrix()
+# matrixY.showMatrix()
+
+# _ = matrixA.operasiIterasiJacobi(matrixY.matrix)
+# print(_)
+
+# hasil = np.zeros((3, 1))
+
+# for i in range(3):
+#     hasil[i, 0] = _[i]
+
+# print(hasil)
+
+# matrixA.matrix.dot(hasil)

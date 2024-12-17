@@ -384,7 +384,7 @@ class App:
             for i in range(self.row_countA):
                 for j in range(1):
                     if self.entriesC[i][j].get() == '':
-                        self.entriesC[i][j].insert(0, '0')
+                        self.e  ntriesC[i][j].insert(0, '0')
                     self.matrixC.matrix[i] = self.entriesC[i][j].get()
         except:
             Exception('Error')
@@ -727,7 +727,7 @@ class App:
 
             for i in range(len(self.matrixA.result)):
                 label_result = ctk.CTkLabel(result_matrix_frames[0],  # Frame for Hasil
-                                        text=f"{self.matrixA.result[i]:.2f}",
+                                        text=f"{self.matrixA.result[i]}",
                                         font=ctk.CTkFont(family="Arial", size=16, weight="bold"),
                                         text_color="white",
                                         justify="center",
@@ -1035,7 +1035,7 @@ class App:
 
             for i in range(len(self.matrixB.result)):
                 label_result = ctk.CTkLabel(result_matrix_frames[0],  # Frame for Hasil
-                                        text=f"{self.matrixB.result[i]:.2f}",
+                                        text=f"{self.matrixB.result[i]}",
                                         font=ctk.CTkFont(family="Arial", size=16, weight="bold"),
                                         text_color="white",
                                         justify="center",
