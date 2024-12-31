@@ -384,7 +384,7 @@ class App:
             for i in range(self.row_countA):
                 for j in range(1):
                     if self.entriesC[i][j].get() == '':
-                        self.e  ntriesC[i][j].insert(0, '0')
+                        self.entriesC[i][j].insert(0, '0')
                     self.matrixC.matrix[i] = self.entriesC[i][j].get()
         except:
             Exception('Error')
